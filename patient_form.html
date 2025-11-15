@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Patient Entry Form</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      margin: 0;
+      padding: 20px;
+    }
+    .card {
+      max-width: 520px;
+      margin: 30px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(10,20,40,0.06);
+    }
+    h1 {
+      font-size: 22px;
+      margin: 0 0 10px;
+    }
+    label {
+      display: block;
+      margin-top: 14px;
+      font-weight: 600;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #e6e9ef;
+      border-radius: 8px;
+    }
+    button {
+      margin-top: 18px;
+      width: 100%;
+      padding: 12px;
+      font-size: 18px;
+      border: none;
+      background: #0b72ff;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #095ed1;
+    }
+    .status {
+      margin-top: 14px;
+      font-size: 14px;
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>Patient Entry Form</h1>
+
+    <form id="patientForm">
+      <label for="name">Full Name</label>
+      <input id="name" type="text" placeholder="Enter full name" required />
+
+      <label for="phone">Phone Number</label>
+      <input id="phone" type="tel" placeholder="Enter phone number" required />
+
+      <label for="age">Age</label>
+      <input id="age" type="text" placeholder="Enter age" />
+
+      <label for="gender">Gender</label>
+      <select id="gender">
+        <option value="">Select gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+
+      <button type="submit">Submit</button>
+
+      <div class="status" id="status"></div>
+    </form>
+  </div>
+
+<script>
+  // YOUR WEBHOOK URL (Already Inserted)
+  const webhookURL = "https://ritikroshan.app.n8n.cloud/webhook-test/d5638714-ec60-4e3c-81b8-aa1454adb240";
+
+  const form = document.getElementById("patientForm");
+  const statusEl = document.getElementById("status");
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const payload = {
+      name: document.getElementById("name").value.trim(),
+      phone: document.getElementById("phone").value.trim(),
+      age: document.getElementById("age").value.trim(),
+      gender: document.getElementById("gender").value,
+    };
+
+    if (!payload.name || !payload.phone) {
+      statusEl.textContent = "Please enter name and phone.";
+      return;
+    }
+
+    statusEl.textContent = "Submitting...";
+
+    try {
+      const res = await fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        statusEl.textContent = "Submitted successfully!";
+        form.reset();
+      } else {
+        statusEl.textContent = "Server error: " + res.status;
+      }
+    } catch (err) {
+      statusEl.textContent = "Network error: " + err.message;
+    }
+  });
+</script>
+
+</body>
+</html>
